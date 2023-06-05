@@ -1,0 +1,155 @@
+<!-- templates/prediction.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Prédiction de l'âge et du sexe</title>
+    <style>
+        /* CSS pour rendre la vue plus attrayante */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            background-color: #5aabad;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        form {
+            margin-top: 30px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .custom-file-upload {
+            display: inline-block;
+            padding: 8px 12px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .custom-file-upload:hover {
+            background-color: #45a049;
+        }
+
+        #preview {
+            margin-top: 30px;
+        }
+
+        #result {
+            margin-top: 30px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        /* Animation de fondu */
+        .fade-in {
+            opacity: 1;
+        }
+
+        /* Animation de rotation */
+        .rotate {
+            animation: rotate 2s infinite linear;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Prédiction de l'âge et du sexe</h1>
+    </header>
+
+    <!-- Formulaire pour charger la photo -->
+    <form id="upload-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <label for="photo" class="custom-file-upload">Choisir une photo</label>
+        <input type="file" id="photo" accept="image/*" required>
+        <button type="submit">Prédire</button>
+    </form>
+
+    <!-- Affichage de la prévisualisation de l'image -->
+    <div id="preview"></div>
+
+    <!-- Affichage des résultats de la prédiction -->
+    <div id="result"></div>
+
+    <footer>
+        <script>
+            // JavaScript pour afficher la prévisualisation de l'image
+            const photoInput = document.getElementById('photo');
+            const previewDiv = document.getElementById('preview');
+
+            photoInput.addEventListener('change', function() {
+                previewDiv.innerHTML = '';
+
+                const file = this.files[0];
+                const reader = new FileReader();
+
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '500px';
+                    img.style.maxHeight = '500px';
+                    previewDiv.appendChild(img);
+                }
+
+                reader.readAsDataURL(file);
+            });
+
+            // JavaScript pour soumettre le formulaire via AJAX et afficher les résultats de la prédiction
+            const form = document.getElementById('upload-form');
+            const resultDiv = document.getElementById('result');
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const formData = new FormData(form);
+
+                fetch('prediction', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultDiv.innerHTML = '';
+
+                    const agePara = document.createElement('p');
+                    agePara.textContent = 'Âge : ' + data.age;
+                    resultDiv.appendChild(agePara);
+
+                    const genderPara = document.createElement('p');
+                    genderPara.textContent = 'Sexe : ' + data.gender;
+                    resultDiv.appendChild(genderPara);
+
+                    // Ajout des animations
+                    resultDiv.classList.add('fade-in');
+                    agePara.classList.add('rotate');
+                })
+                .catch(error => console.log(error));
+            });
+
+            // Fonction pour récupérer la valeur du cookie CSRF
+            function getCookie(name) {
+                const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+                return cookieValue ? cookieValue.pop() : '';
+            }
+        </script>
+    </footer>
+</body>
+</html>

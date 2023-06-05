@@ -1,0 +1,1 @@
+web: gunicorn entreunosysceros.wsgi --log-file -

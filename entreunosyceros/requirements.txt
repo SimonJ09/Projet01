@@ -1,4 +1,4 @@
-Django==4.2.1
+Django
 gunicorn==20.1.0
 tensorflow==2.6.0
 numpy==1.21.0

@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from PIL import Image
 import numpy as np
-import tensorflow as tf
+#import tensorflow as tf
 
 from .models import Utilisateur
 
@@ -17,10 +17,10 @@ def index(request):
 
 
 # Chemin vers le fichier .h5 du modèle entraîné
-chemin_modele = 'chemin/vers/le/modele.h5'
+#chemin_modele = 'chemin/vers/le/modele.h5'
 
 # Charger le modèle à partir du fichier .h5
-modele = tf.keras.models.load_model(chemin_modele)
+#modele = tf.keras.models.load_model(chemin_modele)
 
 def prediction(request):
     content = {'a': 'hello'}

@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-&jwnud2*i55(ttwosiio@-9%c90q=ajr9v0ih7h7z-6x94$d&s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','0.0.0.0']
+ALLOWED_HOSTS = ['0.0.0.0']
 
 
 # Application definition
@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'entreunosycero',
+    'xages',
 ]
 
 MIDDLEWARE = [
@@ -51,14 +51,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'entreunosyceros.urls'
+ROOT_URLCONF = 'xage.urls'
 
 print(BASE_DIR)
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'entreunosyceros/templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'xage/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'entreunosyceros.wsgi.application'
+WSGI_APPLICATION = 'xage.wsgi.application'
 
 
 # Database

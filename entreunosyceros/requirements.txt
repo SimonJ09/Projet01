@@ -1,3 +1,4 @@
+virtualenv
 Django
 gunicorn==20.1.0
 tensorflow==2.6.0

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+pip install --upgrade typing-extensions
+
 # Activation de l'environnement virtuel (si applicable)
 source django-apps/env/bin/activate
 

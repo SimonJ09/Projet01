@@ -1,158 +1,117 @@
-<!-- templates/prediction.html -->
-
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Prédiction de l'âge et du sexe</title>
+    <title>Prediction</title>
     <style>
-        /* CSS pour rendre la vue plus attrayante */
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 50px;
-            background-color: #5aabad;
+            background-color: #f2f2f2;
         }
-
+        
         h1 {
-            color: #333;
+            color: #333333;
+            text-align: center;
+            margin-top: 50px;
         }
-
+        
         form {
-            margin-top: 30px;
+            text-align: center;
+            margin-top: 50px;
         }
-
+        
         input[type="file"] {
             display: none;
         }
-
-        .custom-file-upload {
-            display: inline-block;
-            padding: 8px 12px;
-            cursor: pointer;
+        
+        .upload-btn {
             background-color: #4CAF50;
             color: white;
-            border-radius: 4px;
+            padding: 10px 20px;
             border: none;
-            transition: background-color 0.3s;
+            cursor: pointer;
         }
-
-        .custom-file-upload:hover {
+        
+        .upload-btn:hover {
             background-color: #45a049;
         }
-
+        
         #preview {
-            margin-top: 30px;
+            text-align: center;
+            margin-top: 50px;
         }
-
-        #result {
-            margin-top: 30px;
-            opacity: 0;
-            transition: opacity 0.5s;
+        
+        #preview img {
+            max-width: 400px;
+            height: auto;
         }
-
-        /* Animation de fondu */
-        .fade-in {
-            opacity: 1;
+        
+        #results {
+            text-align: center;
+            margin-top: 20px;
         }
-
-        /* Animation de rotation */
-        .rotate {
-            animation: rotate 2s infinite linear;
+        
+        #results h2 {
+            color: #333333;
+            margin-top: 10px;
         }
-
-        @keyframes rotate {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        
+        .female {
+            color: #FF69B4;
+        }
+        
+        .male {
+            color: #3366CC;
+        }
+        
+        #predict-btn {
+            background-color: #3366CC;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        
+        #predict-btn:hover {
+            background-color: #2A4F99;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Prédiction de l'âge et du sexe</h1>
-    </header>
-
-    <!-- Formulaire pour charger la photo -->
-    <form id="upload-form" enctype="multipart/form-data">
+    <h1>Prediction</h1>
+    <form method="post" action="{% url 'prediction' %}" enctype="multipart/form-data">
         {% csrf_token %}
-        <label for="photo" class="custom-file-upload">Choisir une photo</label>
-        <input type="file" id="photo" accept="image/*" required>
-        <button type="submit">Prédire</button>
+        <label for="photo" class="upload-btn">Select an Image</label>
+        <input type="file" id="photo" name="photo" accept="image/*" required>
+        <input type="submit" value="Predict" id="predict-btn" style="display: none;">
     </form>
 
-    <!-- Affichage de la prévisualisation de l'image -->
     <div id="preview"></div>
 
-    <!-- Affichage des résultats de la prédiction -->
-    <div id="result"></div>
+    <div id="results">
+        {% if age and sexe %}
+            <h2>Age: {{ age }}</h2>
+            <h2>Sexe: <span class="{{ sexe }}">{{ sexe }}</span></h2>
+        {% endif %}
+    </div>
 
-    <footer>
-        <script>
-            // JavaScript pour afficher la prévisualisation de l'image
-            const photoInput = document.getElementById('photo');
-            const previewDiv = document.getElementById('preview');
+    <script>
+        // Afficher l'aperçu de l'image sélectionnée
+        document.getElementById('photo').addEventListener('change', function(event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
 
-            photoInput.addEventListener('change', function() {
-                previewDiv.innerHTML = '';
+            reader.onload = function(e) {
+                var preview = document.getElementById('preview');
+                var image = new Image();
+                image.src = e.target.result;
 
-                const file = this.files[0];
-                const reader = new FileReader();
+                preview.innerHTML = '';
+                preview.appendChild(image);
+                document.getElementById('predict-btn').style.display = 'block';
+            };
 
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.style.maxWidth = '500px';
-                    img.style.maxHeight = '500px';
-                    previewDiv.appendChild(img);
-                }
-
-                reader.readAsDataURL(file);
-            });
-
-            // JavaScript pour soumettre le formulaire via AJAX et afficher les résultats de la prédiction
-            const form = document.getElementById('upload-form');
-            const resultDiv = document.getElementById('result');
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                const formData = new FormData(form);
-
-                fetch('prediction', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    resultDiv.innerHTML = '';
-
-                    const agePara = document.createElement('p');
-                    agePara.textContent = 'Âge : ' + data.age;
-                    resultDiv.appendChild(agePara);
-
-                    const genderPara = document.createElement('p');
-                    genderPara.textContent = 'Sexe : ' + data.sexe;
-                    resultDiv.appendChild(genderPara);
-
-                    // Ajout des animations
-                    resultDiv.classList.add('fade-in');
-                    agePara.classList.add('rotate');
-                })
-                .catch(error => console.log(error));
-            });
-
-            // Fonction pour récupérer la valeur du cookie CSRF
-            function getCookie(name) {
-                const cookieValue = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-                return cookieValue ? cookieValue.pop() : '';
-            }
-        </script>
-    </footer>
+            reader.readAsDataURL(file);
+        });
+    </script>
 </body>
 </html>

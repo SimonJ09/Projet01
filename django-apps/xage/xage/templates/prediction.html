@@ -124,6 +124,9 @@
                 fetch('prediction', {
                     method: 'POST',
                     body: formData,
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken')
+                    }
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -134,7 +137,7 @@
                     resultDiv.appendChild(agePara);
 
                     const genderPara = document.createElement('p');
-                    genderPara.textContent = 'Sexe : ' + data.gender;
+                    genderPara.textContent = 'Sexe : ' + data.sexe;
                     resultDiv.appendChild(genderPara);
 
                     // Ajout des animations

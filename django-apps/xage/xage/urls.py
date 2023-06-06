@@ -16,13 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from xages import views 
-
-from xages.views import index
-from xages.views import prediction
+from xages import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path('prediction', views.prediction, name='prediction'),
+    path('prediction/', views.prediction, name='prediction'),
 ]
+

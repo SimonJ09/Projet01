@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from PIL import Image
 import numpy as np
-import tensorflow as tf
+import pickle
 
 from .models import Utilisateur
 
@@ -15,12 +15,6 @@ def index(request):
     content = {'a': 'hello'}
     return render(request, 'prediction.html', content)
 
-
-# Chemin vers le fichier .h5 du modèle entraîné
-chemin_modele = 'modele.h5'
-
-# Charger le modèle à partir du fichier .h5modele = tf.keras.models.load_model(chemin_modele)
-
 def prediction(request):
     content = {'a': 'hello'}
     return render(request, 'index.html', content)
@@ -29,6 +23,10 @@ def prediction0(request):
     if request.method == 'POST':
         if 'photo' not in request.FILES:
             return render(request, 'prediction.html')
+
+        # Load the saved Random Forest model
+        with open('model.pkl', 'rb') as file:
+            model = pickle.load(file)
 
         # Récupérer la photo téléchargée par l'utilisateur
         photo = request.FILES['photo']
@@ -40,19 +38,17 @@ def prediction0(request):
         img = img / 255.0  # Normaliser les valeurs des pixels entre 0 et 1
         img = np.expand_dims(img, axis=0)  # Ajouter une dimension pour représenter le batch
 
-        # Effectuer la prédiction de l'âge et du sexe en utilisant le modèle
-        # Assumons que `modele` est chargé et prêt à effectuer des prédictions
-        resultat_prediction = modele.predict(img)
+        # Effectuer la prédiction en utilisant le modèle
+        resultat_prediction = model.predict(img)
 
-        # Supposons que le résultat de la prédiction est un dictionnaire
-        age = resultat_prediction['age']
-        sexe = get_sexe_label(resultat_prediction['sexe'])
+        # Supposons que le résultat de la prédiction est un entier pour le sexe (0 ou 1)
+        sexe = get_sexe_label(resultat_prediction)
 
         # Enregistrer les informations dans la base de données
-        utilisateur = Utilisateur(photo=photo, age=age, sexe=sexe)
+        utilisateur = Utilisateur(photo=photo, sexe=sexe)
         utilisateur.save()
 
         # Renvoyer les résultats de la prédiction à l'interface utilisateur
-        return render(request, 'result.html', {'age': age, 'sexe': sexe})
+        return render(request, 'result.html', {'sexe': sexe})
     else:
         return render(request, 'prediction.html')

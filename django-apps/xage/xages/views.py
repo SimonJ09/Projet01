@@ -44,8 +44,10 @@ def prediction(request):
 
             # Supposons que le résultat de la prédiction est un tableau [[age, sexe]]
             if resultat_prediction.shape == (1, 2):
+                re = resultat_prediction
                 age = resultat_prediction[0][0]
                 sexe = get_sexe_label(resultat_prediction[0][1])
+                test = 'ohoho'
             else:
                 # Handle the case when the prediction result doesn't have the expected shape
                 age = "Unknown"
@@ -56,7 +58,7 @@ def prediction(request):
             # utilisateur.save()
 
             # Renvoyer les résultats de la prédiction à l'interface utilisateur
-            return render(request, 'prediction.html', {'age': age, 'sexe': sexe})
+            return render(request, 'prediction.html', {'age': age, 'sexe': sexe, 'er': test})
 
         except Exception as e:
             # Gérer les erreurs lors du chargement du modèle ou de la prédiction
